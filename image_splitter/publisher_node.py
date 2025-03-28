@@ -3,11 +3,13 @@ from rclpy.node import Node
 import cv2
 from sensor_msgs.msg import Image
 from cv_bridge import CvBridge
+from custom_messages.msg import ImagePiece
 
 class ImageSplitterPublisher(Node):
     def __init__(self):
         super().__init__('image_splitter_publisher')
 
+        """
         # This is most likely not the best way.
         # better would be to make multiple id:s not topics.
         self.img_publishers = []
@@ -15,8 +17,11 @@ class ImageSplitterPublisher(Node):
             topic_name = f'image_piece_{i}'
             pub = self.create_publisher(Image, topic_name, 10)
             self.img_publishers.append(pub)
-        self.bridge = CvBridge()
+        self.bridge = CvBridge()"""
+        topic_name = "image_pieces"
 
+        self.publisher = self.create_publisher(ImagePiece, topic_name, 10)
+        self.bridge = CvBridge()
 
     # num_rows and num_cols need to be modified to change the number of image pieces
     def split_image(self, image, num_rows=2, num_cols=4):
@@ -43,14 +48,14 @@ class ImageSplitterPublisher(Node):
         for i in range(0,len(pieces)):
             cv2.imwrite(f"/home/rlab/imagePart{i}.png", pieces[i])
 
-        for idx, pub in enumerate(self.img_publishers, start=1):
+        for idx, piece in enumerate(pieces):
             if idx < len(pieces):
-            
-                image_piece = pieces[idx]
-
-                msg = self.bridge.cv2_to_imgmsg(image_piece, encoding="bgr8")
-                pub.publish(msg)
-                self.get_logger().info(f"Published image piece {idx} on topic /image_piece_{idx}.")
+                msg = ImagePiece()
+                msg.piece_id = idx
+                msg.image = self.bridge.cv2_to_imgmsg(piece, encoding="bgr8")
+                self.publisher.publish(msg)
+                
+                self.get_logger().info(f"Published image piece {idx}.")
                 
             else:
                 self.get_logger().warn(f"Not enough pieces to publish for index  {idx}")
