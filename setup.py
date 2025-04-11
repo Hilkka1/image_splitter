@@ -21,7 +21,7 @@ setup(
     entry_points={
         'console_scripts': [
             'publisher = image_splitter.publisher_node:main',
-            'runner' = 'image_splitter.run_subscribers:main'
+            'runner = image_splitter.run_subscribers:main'
         ],
     },
 )
