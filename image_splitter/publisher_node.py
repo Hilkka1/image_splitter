@@ -24,14 +24,15 @@ class ImageSplitterPublisher(Node):
         self.bridge = CvBridge()
 
     # num_rows and num_cols need to be modified to change the number of image pieces
-    def split_image(self, image, num_rows=2, num_cols=4):
+    def split_image(self, image, num_rows=4, num_cols=2):
         pieces = []
         height , width, channels = image.shape
         piece_height = height // num_rows
         piece_width = width // num_cols
+        image_rotated = cv2.rotate(image, cv2.ROTATE_90_CLOCKWISE)
         for i in range(num_rows):
             for j in range(num_cols):
-                piece = image[i * piece_height:(i+1) * piece_height,
+                piece = image_rotated[i * piece_height:(i+1) * piece_height,
                         j * piece_width:(j + 1) * piece_width]
                 pieces.append(piece)
                 
