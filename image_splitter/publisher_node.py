@@ -29,10 +29,9 @@ class ImageSplitterPublisher(Node):
         height , width, channels = image.shape
         piece_height = height // num_rows
         piece_width = width // num_cols
-        image_rotated = cv2.rotate(image, cv2.ROTATE_90_CLOCKWISE)
         for i in range(num_rows):
             for j in range(num_cols):
-                piece = image_rotated[i * piece_height:(i+1) * piece_height,
+                piece = image[i * piece_height:(i+1) * piece_height,
                         j * piece_width:(j + 1) * piece_width]
                 pieces.append(piece)
                 
@@ -50,9 +49,9 @@ class ImageSplitterPublisher(Node):
             cv2.imwrite(f"/home/rlab/imagePart{i}.png", pieces[i])
 
         for idx, piece in enumerate(pieces):
-            if idx < len(pieces):
+            if idx+1 < len(pieces)+1:
                 msg = ImagePiece()
-                msg.piece_id = idx
+                msg.piece_id = idx+1
                 msg.image = self.bridge.cv2_to_imgmsg(piece, encoding="bgr8")
                 self.publisher.publish(msg)
                 
