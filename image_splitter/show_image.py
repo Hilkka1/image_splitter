@@ -13,13 +13,13 @@ def main(args=None):
             id = i[-1]
             ssh = paramiko.SSHClient()
             ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
-            ssh.connect(ip_address[i], username=user, password=pw)
+            ssh.connect(hostname=i, username=user, password=pw)
             print(f"Connected, now running ros2 run command with id {id}")
         
             ssh.exec_command('cd ros2_ws')
             ssh.exec_command('source install/setup.bash')
             ssh.exec_command('colcon build')
-            ssh.exec_command(f'ros2 run image_subscriber {id}')
+            ssh.exec_command(f'ros2 run image_subscriber subscriber {id}')
             ssh.close()
         
     except Exception as e:

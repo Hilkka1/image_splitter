@@ -26,6 +26,8 @@ class ImageSplitterPublisher(Node):
 
         self.publisher = self.create_publisher(ImagePiece, topic_name, 10)
         self.bridge = CvBridge()
+        self.x = 0
+        self.y = 0
 
     # num_rows and num_cols need to be modified to change the number of image pieces
     def split_image(self, image, num_rows=4, num_cols=2):
@@ -107,12 +109,9 @@ class ImageSplitterPublisher(Node):
     def add_goal(self, image):
         # ask user for the coordintes for the goal
         
-        x = int(input("Please add the x-coordinate of the goal as an integer."))
-        y = int(input("Please add the y-coordinate of the goal as an integer."))
-        
         goal_diameter = 10
         goal_width = 3
-        return cv2.circle(image, (x,y),goal_diameter,(0,0,255),goal_width)
+        return cv2.circle(image, (self.x,self.y),goal_diameter,(0,0,255),goal_width)
     
 
     def publish_image_pieces(self, video_path):
@@ -123,6 +122,8 @@ class ImageSplitterPublisher(Node):
         
         # Ask user for the time interval as seconds
         time_interval = int(input("Please input the time interval of the image change in seconds: "))
+        self.x = int(input("Please add the x-coordinate of the goal as an integer."))
+        self.y = int(input("Please add the y-coordinate of the goal as an integer."))
         
         for image_path in image_paths:
                 absolute_path = self.image_directory_path + "/" + image_path
@@ -130,6 +131,7 @@ class ImageSplitterPublisher(Node):
                 image = cv2.imread(absolute_path)
                 
                 goal_added = self.add_goal(image)
+  
                 pieces = self.split_image(goal_added)
                 
 
